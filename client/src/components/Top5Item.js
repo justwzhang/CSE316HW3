@@ -8,7 +8,10 @@ import { GlobalStoreContext } from '../store'
 */
 function Top5Item(props) {
     const { store } = useContext(GlobalStoreContext);
-    const [draggedTo, setDraggedTo] = useState(0);
+    const [ draggedTo, setDraggedTo] = useState(0);
+    const [ editActive, setEditActive ] = useState(false);
+    const [ currentItemText, setItemText] = useState(store.currentList.items[props.index]);
+    const [ oldItemText, setOldItemText] = useState(store.currentList.items[props.index]);
 
     function handleDragStart(event) {
         event.dataTransfer.setData("item", event.target.id);
@@ -28,6 +31,30 @@ function Top5Item(props) {
         setDraggedTo(false);
     }
 
+    function handleEditItem(event){
+        event.preventDefault();
+        let newActive = !editActive;
+        setEditActive(newActive);
+    }
+
+    function handleKeyPress(event){
+        if(event.code === "Enter"){
+            if(oldItemText !== currentItemText){
+                store.addChangeItemTransaction(props.index, oldItemText, currentItemText);
+                setOldItemText(currentItemText);
+            }
+            let newActive = !editActive;
+            setEditActive(newActive);
+        }
+    }
+
+    function handleUpdateText(event){
+        if(event.target.value.length !== 0){
+            setItemText(event.target.value);
+        }else{
+            setItemText(" ");
+        }
+    }
     function handleDrop(event) {
         event.preventDefault();
         let target = event.target;
@@ -46,8 +73,8 @@ function Top5Item(props) {
     if (draggedTo) {
         itemClass = "top5-item-dragged-to";
     }
-    return (
-        <div
+    let item =
+    <div
             id={'item-' + (index + 1)}
             className={itemClass}
             onDragStart={handleDragStart}
@@ -61,10 +88,23 @@ function Top5Item(props) {
                 type="button"
                 id={"edit-item-" + index + 1}
                 className="list-card-button"
+                onClick = {handleEditItem}
                 value={"\u270E"}
             />
             {props.text}
-        </div>)
+        </div>; 
+    if(editActive){
+        item = 
+        <input
+                id={"item-" + (index + 1)}
+                className = "top5-item"
+                type='text'
+                onKeyPress={handleKeyPress}
+                onChange={handleUpdateText}
+                defaultValue={currentItemText}
+            />;
+    }
+    return item;
 }
 
 export default Top5Item;

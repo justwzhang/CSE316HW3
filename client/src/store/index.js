@@ -2,6 +2,7 @@ import { createContext, useState } from 'react'
 import jsTPS from '../common/jsTPS'
 import api from '../api'
 import MoveItem_Transaction from '../transactions/MoveItem_Transaction'
+import ChangeItem_Transaction from '../transactions/ChangeItem_Transaction'
 export const GlobalStoreContext = createContext({});
 /*
     This is our global data store. Note that it uses the Flux design pattern,
@@ -270,7 +271,15 @@ export const useGlobalStore = () => {
         asyncHandleAddList();
         console.log("test");
     }
-
+    store.addChangeItemTransaction = function(index, oldText, newText){
+        let transaction = new ChangeItem_Transaction(store, index, oldText, newText);
+        tps.addTransaction(transaction);
+    }
+    //change the name of an item
+    store.changeItemName = function(index, text){
+        store.currentList.items[index] = text
+        store.updateCurrentList();
+    }
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
     return { store, storeReducer };
 }
