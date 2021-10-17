@@ -17,7 +17,8 @@ export const GlobalStoreActionType = {
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
-    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE"
+    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    ADD_NEW_LIST: "ADD_NEW_LIST"
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -91,6 +92,17 @@ export const useGlobalStore = () => {
                     idNamePairs: store.idNamePairs,
                     currentList: payload,
                     newListCounter: store.newListCounter,
+                    isListNameEditActive: true,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                });
+            }
+            //add a new List through a button press
+            case GlobalStoreActionType.ADD_NEW_LIST:{
+                return setStore({
+                    idNamePairs: [...store.idNamePairs, payload.newIdNamePair],
+                    currentList: payload.newCurrentList,
+                    newListCounter: ++store.newListCounter,
                     isListNameEditActive: true,
                     isItemEditActive: false,
                     listMarkedForDeletion: null
@@ -235,6 +247,28 @@ export const useGlobalStore = () => {
             type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
             payload: null
         });
+    }
+
+    store.handleAddList = function(newList){
+        async function asyncHandleAddList(){
+            let response = await api.createTop5List(newList);
+            if(response.data.success){
+                let newCurrentList = response.data.top5List;
+                let id = newCurrentList._id;
+                let responseName = newCurrentList.name;
+                let newPair = {_id: id, name: responseName};
+                storeReducer({
+                    type: GlobalStoreActionType.ADD_NEW_LIST,
+                    payload:{
+                        newIdNamePair: newPair,
+                        newCurrentList: newCurrentList
+                    }
+                });
+                store.setCurrentList(id);
+            }
+        }
+        asyncHandleAddList();
+        console.log("test");
     }
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
