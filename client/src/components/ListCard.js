@@ -26,6 +26,11 @@ function ListCard(props) {
         }
     }
 
+    function handleMarkForDeletion(event){
+        event.stopPropagation();
+        store.markListForDeletion(idNamePair._id);
+    }
+
     function handleToggleEdit(event) {
         event.stopPropagation();
         toggleEdit();
@@ -87,6 +92,7 @@ function ListCard(props) {
                 disabled={cardStatus}
                 type="button"
                 id={"delete-list-" + idNamePair._id}
+                onClick={handleMarkForDeletion}
                 className="list-card-button"
                 value={"\u2715"}
             />

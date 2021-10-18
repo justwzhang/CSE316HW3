@@ -32,6 +32,7 @@ function Top5Item(props) {
     }
 
     function handleEditItem(event){
+        store.setItemEditActive();
         event.preventDefault();
         let newActive = !editActive;
         setEditActive(newActive);
