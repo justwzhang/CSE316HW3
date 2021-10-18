@@ -32,6 +32,7 @@ function Top5Item(props) {
     }
 
     function handleEditItem(event){
+        setItemText(store.currentList.items[props.index]);
         store.setItemEditActive();
         event.preventDefault();
         let newActive = !editActive;
@@ -43,6 +44,8 @@ function Top5Item(props) {
             if(oldItemText !== currentItemText){
                 store.addChangeItemTransaction(props.index, oldItemText, currentItemText);
                 setOldItemText(currentItemText);
+            }else{
+                store.setItemEditFalse();
             }
             let newActive = !editActive;
             setEditActive(newActive);
@@ -64,15 +67,21 @@ function Top5Item(props) {
         let sourceId = event.dataTransfer.getData("item");
         sourceId = sourceId.substring(sourceId.indexOf("-") + 1);
         setDraggedTo(false);
-
+        //setItemText(store.currentList.items[targetId]);
         // UPDATE THE LIST
         store.addMoveItemTransaction(sourceId, targetId);
     }
 
     let { index } = props;
     let itemClass = "top5-item";
+    
     if (draggedTo) {
         itemClass = "top5-item-dragged-to";
+    }
+    let cardbuttonClass = "list-card-button";
+    let Status = false;
+    if(store.isItemEditActive){
+        Status = true;
     }
     let item =
     <div
@@ -86,7 +95,8 @@ function Top5Item(props) {
             draggable="true"
         >
             <input
-                type="button"
+                disabled={Status}
+                type="button"                
                 id={"edit-item-" + index + 1}
                 className="list-card-button"
                 onClick = {handleEditItem}

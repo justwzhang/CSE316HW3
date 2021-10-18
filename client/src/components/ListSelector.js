@@ -13,7 +13,7 @@ const ListSelector = () => {
     store.history = useHistory();
     function handleAddList(event){
         let number = store.newListCounter;
-        let tempName = "Untitled " + number;
+        let tempName = "Untitled" + number;
         let newList = {
             name: tempName,
             items: ["?", "?", "?", "?", "?"]
